@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        font-size: 100%;
+        font-family: "Inter", "Helvetica", "Arial", sans-serif;
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin: 0.75rem;
+      }
+
+      p {
+        font-size: 1.5rem;
+        margin: 0.75rem;
+      }
+
+      .home-container {
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        align-content: center;
+      }
+
+      .file-upload {
+        margin: 0.75rem;
+      }
+    </style>
+    <title>Home</title>
+  </head>
+  <body>
+    <main class="home-container">
+      <h1>JSON Tree Viewer</h1>
+      <p>Simple JSON Viewer that runs completely on-client. No data exchange</p>
+      <form class="file-upload">
+        <input type="file" name="json-file" id="json-file" />
+      </form>
+    </main>
+
+    <script>
+      const fileUpload = document.querySelector(".file-upload");
+      const fileInput = document.querySelector("#json-file");
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const json = JSON.parse(e.target.result);
+          localStorage.setItem("json", JSON.stringify(json));
+          window.location.href = "./tree.html";
+        };
+
+        reader.readAsText(file);
+      });
+    </script>
+  </body>
+</html>
