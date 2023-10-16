@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -14,35 +15,174 @@
       }
       html,
       body {
+        margin: 0;
         font-size: 100%;
         font-family: "Inter", "Helvetica", "Arial", sans-serif;
+        background-color: #fff;
       }
 
-      h1 {
-        font-size: 3rem;
-        margin: 0.75rem;
+      .file-name {
+        font-size: 2rem;
+        margin: 0;
       }
 
-      p {
-        font-size: 1.5rem;
-        margin: 0.75rem;
-      }
-
-      .home-container {
+      .tree-container {
+        width: 40rem;
         display: grid;
-        place-items: center;
         height: 100vh;
-        align-content: center;
+        justify-items: start;
+        gap: 1.5rem;
+        margin: 0 auto;
+        align-items: start;
+        grid-template-rows: 1fr 99fr;
       }
 
-      .file-upload {
-        margin: 0.75rem;
+      .type-array,
+      .type-obj,
+      .field {
+        margin: 0;
+      }
+
+      .field {
+        color: #4e9590;
+      }
+
+      .field span {
+        color: #000;
+      }
+
+      .type-array,
+      .type-obj {
+        margin: 0;
+        padding: 0 0 0 1.125rem;
+        font-size: 1rem;
+        line-height: 1.75;
+        position: relative;
+      }
+
+      .type-array {
+        padding-bottom: 1.125rem;
+      }
+
+      .type-array::before,
+      .type-obj::before {
+        content: "";
+        position: absolute;
+        width: 1px;
+        background-color: #bfbfbf;
+        bottom: 1.725rem;
+        top: 1.5rem;
+        left: 0.125rem;
+      }
+
+      .type-obj::before {
+        top: 1.725rem;
+        bottom: 0;
+      }
+
+      .type-array > .key,
+      .type-obj > .key {
+        transform: translateX(-1.125rem);
+        color: #4e9590;
+      }
+
+      .type-array[open]::after {
+        content: "]";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        font-weight: bold;
+        color: #f2cab8;
+      }
+
+      .type-array .key,
+      .type-obj .key {
+        list-style: none;
+        cursor: pointer;
+      }
+      .key::-webkit-details-marker {
+        display: none;
+      }
+
+      .type-array > .key::after {
+        content: "[...]";
+        display: inline-block;
+        margin-left: 0.5ex;
+        font-weight: bold;
+        color: #f2cab8;
+      }
+
+      .type-array[open] > .key::after {
+        content: "[";
+      }
+
+      .type-array > .field,
+      .type-array > .type-array > .key,
+      .type-array > .type-obj > .key {
+        color: #bfbfbf;
       }
     </style>
-    <title>Home</title>
+    <title>Tree viewer</title>
   </head>
   <body>
-    <main class="tree-container"></main>
+    <main class="tree-container">
+      <h1 id="file-name" class="file-name">alltypes.json</h1>
+      <div class="tree-viewer">
+        <details class="type-array" open>
+          <summary class="key">Actors:</summary>
+
+          <details class="type-obj" open>
+            <summary class="key">0:</summary>
+
+            <p class="field">name: <span>Tom Cruise</span></p>
+            <p class="field">age: <span>56</span></p>
+            <p class="field">Born At: <span>Syracuse, NY</span></p>
+            <p class="field">Birthdate: <span>July 3, 1962</span></p>
+            <p class="field">
+              photo: <span>https://jsonformatter.org/img/tom-cruise.jpg</span>
+            </p>
+            <p class="field">wife: <span>null</span></p>
+            <p class="field">weight: <span>67.5</span></p>
+            <p class="field">hasChildren: <span>true</span></p>
+            <p class="field">hasGreyHair: <span>false</span></p>
+            <p class="field">
+              <details class="type-array" open>
+                <summary class="key">children:</summary>
+
+                <p class="field">0: <span>Suri</span></p>
+                <p class="field">1: <span>Isabella Jane</span></p>
+                <p class="field">2: <span>Connor</span></p>
+              </details>
+            </p>
+          </details>
+
+          <details class="type-obj" open>
+            <summary class="key">1:</summary>
+
+            <p class="field">name: <span>Robert Downey Jr.</span></p>
+            <p class="field">age: <span>53</span></p>
+            <p class="field">Born At: <span>New York City, NY</span></p>
+            <p class="field">Birthdate: <span>April 4, 1965</span></p>
+            <p class="field">
+              photo:
+              <span>https://jsonformatter.org/img/Robert-Downey-Jr.jpg</span>
+            </p>
+            <p class="field">wife: <span>Susan Downey</span></p>
+            <p class="field">weight: <span>77.1</span></p>
+            <p class="field">hasChildren: <span>true</span></p>
+            <p class="field">hasGreyHair: <span>false</span></p>
+            <p class="field">
+              <details class="type-array" open>
+                <summary class="key">children:</summary>
+                <p class="field">0: <span>Indio Falconer</span></p>
+                <p class="field">1: <span>Avri Roel</span></p>
+                <p class="field">2: <span>Exton Elias</span></p>
+              </details>
+            </p>
+          </details>
+        </details>
+      </div>
+    </main>
     <script></script>
   </body>
 </html>

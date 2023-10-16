@@ -14,18 +14,19 @@
       }
       html,
       body {
+        margin: 0;
         font-size: 100%;
         font-family: "Inter", "Helvetica", "Arial", sans-serif;
       }
 
       h1 {
         font-size: 3rem;
-        margin: 0.75rem;
+        margin: 0;
       }
 
       p {
+        margin: 0;
         font-size: 1.5rem;
-        margin: 0.75rem;
       }
 
       .home-container {
@@ -33,10 +34,12 @@
         place-items: center;
         height: 100vh;
         align-content: center;
-      }
-
-      .file-upload {
-        margin: 0.75rem;
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+        gap: 1.5rem;
+        width: 60rem;
+        margin: 0 auto;
       }
     </style>
     <title>Home</title>
@@ -51,21 +54,22 @@
     </main>
 
     <script>
-      const fileUpload = document.querySelector(".file-upload");
-      const fileInput = document.querySelector("#json-file");
+      var fileInput = document.querySelector("#json-file");
+      fileInput.addEventListener("change", handleFileUpload);
 
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
+      function handleFileUpload(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
 
         reader.onload = (e) => {
-          const json = JSON.parse(e.target.result);
-          localStorage.setItem("json", JSON.stringify(json));
-          window.location.href = "./tree.html";
+          var json = JSON.stringify(JSON.parse(e.target.result), null, 2);
+          console.info(json.split("\n"));
+          // localStorage.setItem("fileName", file.name);
+          // window.location.href = "/tree.html";
         };
 
         reader.readAsText(file);
-      });
+      }
     </script>
   </body>
 </html>
