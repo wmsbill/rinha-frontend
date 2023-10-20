@@ -97,8 +97,13 @@
       function handleFileUpload(e) {
         buttonLabel.innerText = "loading...";
         var file = e.target.files[0];
+        var t0 = performance.now();
+
         fileReader.postMessage(file);
-        fileReader.onmessage = (e) => console.info(e.data);
+        fileReader.onmessage = () => {
+          var t1 = performance.now();
+          console.log(t1 - t0);
+        };
         fileReader.onerror = (event) => {
           console.log(event);
         };

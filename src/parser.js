@@ -3,7 +3,7 @@ import clarinet from "clarinet";
 export async function* lazyParseJSON(text) {
   const parser = clarinet.parser();
   const parent = ["root"];
-  const arrayIndex = [];
+  const arrayIndex = [0];
   let currentKey = null;
   let depth = 0;
   let lines = 0;
@@ -23,10 +23,13 @@ export async function* lazyParseJSON(text) {
   };
 
   const handleOpen = (type, value) => {
-    if (parent.at(-1) === "array") {
+    if (
+      parent.at(-1) === "array" ||
+      (parent.at(-1) === "root" && type === "array")
+    ) {
       currentKey = arrayIndex[depth]++;
     }
-    if (currentKey) {
+    if (currentKey !== null) {
       pushEvent(value, currentKey);
       depth++;
     }

@@ -112,7 +112,42 @@ describe("lazyParseJSON", () => {
     });
   });
 
-  describe("Nested arrays", () => {
+  describe("Arrays", () => {
+    it("parses an empty array", async () => {
+      const text = (async function* () {
+        yield `[]`;
+      })();
+
+      const parser = lazyParseJSON(text);
+      const events = [];
+      for await (const event of parser) {
+        console.info(event);
+        events.push(event);
+      }
+      assert.deepStrictEqual(events, [
+        { value: "[", depth: 0, key: 0, line: 0 },
+        { value: "]", depth: 0, key: null, line: 1 },
+      ]);
+    });
+
+    it("parses a simple array", async () => {
+      const text = (async function* () {
+        yield `["foo", "bar"]`;
+      })();
+
+      const parser = lazyParseJSON(text);
+      const events = [];
+      for await (const event of parser) {
+        events.push(event);
+      }
+      assert.deepStrictEqual(events, [
+        { value: "[", depth: 0, key: 0, line: 0 },
+        { value: "foo", depth: 1, key: 0, line: 1 },
+        { value: "bar", depth: 1, key: 1, line: 2 },
+        { value: "]", depth: 0, key: null, line: 3 },
+      ]);
+    });
+
     it("parses a JSON with nested arrays", async () => {
       const text = (async function* () {
         yield `{"foo": ["bar", "baz"], "qux": ["quux", "quuz"]}`;
