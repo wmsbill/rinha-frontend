@@ -747,7 +747,7 @@
   async function* lazyParseJSON(text) {
     const parser = import_clarinet.default.parser();
     const parent = ["root"];
-    const arrayIndex = [];
+    const arrayIndex = [0];
     let currentKey = null;
     let depth = 0;
     let lines = 0;
@@ -764,10 +764,10 @@
       resolveIfHanging();
     };
     const handleOpen = (type, value) => {
-      if (parent.at(-1) === "array") {
+      if (parent.at(-1) === "array" || parent.at(-1) === "root" && type === "array") {
         currentKey = arrayIndex[depth]++;
       }
-      if (currentKey) {
+      if (currentKey !== null) {
         pushEvent(value, currentKey);
         depth++;
       }
@@ -829,33 +829,25 @@
 
   // src/file-parser.js
   onmessage = (e) => {
-    processJSON(e.data).then(() => postMessage("pong"));
+    processJSON(e.data).then(() => {
+      postMessage("pong");
+    });
   };
   async function processJSON(blob) {
     const reader = read(blob);
-    const text = decode(reader);
-    const ASL = lazyParseJSON(text);
-    await logger(ASL);
-  }
-  async function logger(string) {
-    for await (const part of string) {
-      console.log(part);
+    const ASL = lazyParseJSON(reader);
+    for await (const part of ASL) {
     }
   }
   async function* read(blob) {
     const reader = blob.stream().getReader();
+    const decoder = new TextDecoder();
     while (true) {
       var { done, value } = await reader.read();
       if (done) {
         break;
       }
-      yield value;
-    }
-  }
-  async function* decode(chunk) {
-    const decoder = new TextDecoder();
-    for await (const part of chunk) {
-      yield decoder.decode(part);
+      yield decoder.decode(value);
     }
   }
 })();

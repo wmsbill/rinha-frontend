@@ -103,13 +103,16 @@
         fileReader.onmessage = () => {
           var t1 = performance.now();
           console.log(t1 - t0);
+          buttonLabel.innerText = "Load JSON";
         };
         fileReader.onerror = (event) => {
           console.log(event);
+          buttonLabel.innerText = "Load JSON";
         };
-        // var reader = new FileReader();
 
-        // reader.readAsText(file);
+        window.addEventListener("unload", () => {
+          fileReader.terminate();
+        });
       }
     </script>
   </body>
