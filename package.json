@@ -1,0 +1,20 @@
+{
+  "name": "rinha-frontend",
+  "version": "1.0.0",
+  "description": "@wmsbill implementation of the \"rinha de frontend\" contest",
+  "main": "index.js",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "test": "node --test **/__tests__/*.test.js"
+  },
+  "author": "contact@willian.dev",
+  "license": "GNU",
+  "type": "module",
+  "dependencies": {
+    "clarinet": "^0.12.6",
+    "idb": "^7.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.19.5"
+  }
+}
