@@ -98,18 +98,15 @@
         buttonLabel.innerText = "loading...";
         var file = e.target.files[0];
         var t0 = performance.now();
-
-        fileReader.postMessage(file);
-        fileReader.onmessage = () => {
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = (e) => {
+          var data = e.target.result;
+          var lines = JSON.stringify(JSON.parse(data), null, 2).split("\n");
           var t1 = performance.now();
           console.log(t1 - t0);
+          buttonLabel.innerText = "Load JSON";
         };
-        fileReader.onerror = (event) => {
-          console.log(event);
-        };
-        // var reader = new FileReader();
-
-        // reader.readAsText(file);
       }
     </script>
   </body>
