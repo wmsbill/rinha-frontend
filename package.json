@@ -11,8 +11,7 @@
   "license": "GNU",
   "type": "module",
   "dependencies": {
-    "clarinet": "^0.12.6",
-    "idb": "^7.1.1"
+    "clarinet": "^0.12.6"
   },
   "devDependencies": {
     "esbuild": "0.19.5"

@@ -100,9 +100,10 @@
         var t0 = performance.now();
 
         fileReader.postMessage(file);
-        fileReader.onmessage = () => {
+        fileReader.onmessage = (e) => {
           var t1 = performance.now();
           console.log(t1 - t0);
+          window.gustavo = e;
           buttonLabel.innerText = "Load JSON";
         };
         fileReader.onerror = (event) => {

@@ -1,25 +1,17 @@
 import clarinet from "clarinet";
 
-export async function* lazyParseJSON(text) {
+export function customJSONParser(text) {
   var parser = clarinet.parser();
   var parent = ["root"];
   var arrayIndex = [0];
   var currentKey = null;
   var depth = 0;
-  var lines = 0;
-  var resolve = null;
   var eventQueue = [];
+  var resolve;
+  var promise = new Promise((r) => (resolve = r));
 
-  function resolveIfHanging() {
-    if (resolve) {
-      resolve();
-      resolve = null;
-    }
-  }
-
-  function pushEvent(value, key = null) {
-    eventQueue.push({ value, depth, key, line: lines++ });
-    resolveIfHanging();
+  function pushEvent(value, key) {
+    eventQueue.push([depth, key, value]);
   }
 
   function handleOpen(type, value) {
@@ -38,8 +30,8 @@ export async function* lazyParseJSON(text) {
 
   function handleClose(value) {
     depth--;
-    pushEvent(value, null);
     parent.pop();
+    pushEvent(value, "");
   }
 
   parser.onerror = (e) => {
@@ -51,51 +43,42 @@ export async function* lazyParseJSON(text) {
   };
 
   parser.onvalue = (value) => {
+    // console.info("value");
     var key = parent.at(-1) === "array" ? arrayIndex[depth]++ : currentKey;
     currentKey = null;
     pushEvent(value, key);
   };
 
   parser.onopenobject = (key) => {
+    // console.info("open object");
     handleOpen("object", "{", key);
     currentKey = key;
   };
 
   parser.onopenarray = () => {
+    // console.info("open array");
     handleOpen("array", "[");
     arrayIndex[depth] = 0;
   };
 
   parser.oncloseobject = () => {
+    // console.info("close object");
     if (depth === 0) {
-      resolveIfHanging();
       return;
     }
     handleClose("}");
   };
 
   parser.onclosearray = () => {
+    // console.info("close array");
     handleClose("]");
   };
 
   parser.onend = () => {
-    console.info("end");
+    resolve(eventQueue);
+    // console.info("end");
   };
 
-  while (true) {
-    if (eventQueue.length) {
-      yield eventQueue.shift();
-    } else {
-      var { value, done } = await text.next();
-      if (done) {
-        break;
-      }
-      await new Promise((r) => {
-        resolve = r;
-        parser.write(value);
-      });
-    }
-  }
-
-  parser.close();
+  parser.write(text).close();
+  return promise;
 }

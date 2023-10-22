@@ -744,26 +744,19 @@
 
   // src/parser.js
   var import_clarinet = __toESM(require_clarinet(), 1);
-  async function* lazyParseJSON(text) {
-    const parser = import_clarinet.default.parser();
-    const parent = ["root"];
-    const arrayIndex = [0];
-    let currentKey = null;
-    let depth = 0;
-    let lines = 0;
-    let resolve = null;
-    const eventQueue = [];
-    const resolveIfHanging = () => {
-      if (resolve) {
-        resolve();
-        resolve = null;
-      }
-    };
-    const pushEvent = (value, key = null) => {
-      eventQueue.push({ value, depth, key, line: lines++ });
-      resolveIfHanging();
-    };
-    const handleOpen = (type, value) => {
+  function customJSONParser(text) {
+    var parser = import_clarinet.default.parser();
+    var parent = ["root"];
+    var arrayIndex = [0];
+    var currentKey = null;
+    var depth = 0;
+    var eventQueue = [];
+    var resolve;
+    var promise = new Promise((r) => resolve = r);
+    function pushEvent(value, key) {
+      eventQueue.push([depth, key, value]);
+    }
+    function handleOpen(type, value) {
       if (parent.at(-1) === "array" || parent.at(-1) === "root" && type === "array") {
         currentKey = arrayIndex[depth]++;
       }
@@ -772,12 +765,12 @@
         depth++;
       }
       parent.push(type);
-    };
-    const handleClose = (value) => {
+    }
+    function handleClose(value) {
       depth--;
-      pushEvent(value, null);
       parent.pop();
-    };
+      pushEvent(value, "");
+    }
     parser.onerror = (e) => {
       throw e;
     };
@@ -785,7 +778,7 @@
       currentKey = key;
     };
     parser.onvalue = (value) => {
-      const key = parent.at(-1) === "array" ? arrayIndex[depth]++ : currentKey;
+      var key = parent.at(-1) === "array" ? arrayIndex[depth]++ : currentKey;
       currentKey = null;
       pushEvent(value, key);
     };
@@ -799,7 +792,6 @@
     };
     parser.oncloseobject = () => {
       if (depth === 0) {
-        resolveIfHanging();
         return;
       }
       handleClose("}");
@@ -808,23 +800,10 @@
       handleClose("]");
     };
     parser.onend = () => {
-      console.info("end");
+      resolve(eventQueue);
     };
-    while (true) {
-      if (eventQueue.length) {
-        yield eventQueue.shift();
-      } else {
-        let { value, done } = await text.next();
-        if (done) {
-          break;
-        }
-        await new Promise((r) => {
-          resolve = r;
-          parser.write(value);
-        });
-      }
-    }
-    parser.close();
+    parser.write(text).close();
+    return promise;
   }
 
   // src/file-parser.js
@@ -834,20 +813,8 @@
     });
   };
   async function processJSON(blob) {
-    const reader = read(blob);
-    const ASL = lazyParseJSON(reader);
-    for await (const part of ASL) {
-    }
-  }
-  async function* read(blob) {
-    const reader = blob.stream().getReader();
-    const decoder = new TextDecoder();
-    while (true) {
-      var { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      yield decoder.decode(value);
-    }
+    const reader = new FileReaderSync();
+    const text = reader.readAsText(blob);
+    return await customJSONParser(text);
   }
 })();
