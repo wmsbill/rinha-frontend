@@ -9,123 +9,11 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        margin: 0;
-        font-size: 100%;
-        font-family: "Inter", "Helvetica", "Arial", sans-serif;
-        background-color: #fff;
-      }
-
-      .file-name {
-        font-size: 2rem;
-        margin: 0;
-      }
-
-      .tree-container {
-        width: 40rem;
-        display: grid;
-        height: 100vh;
-        justify-items: start;
-        gap: 1.5rem;
-        margin: 0 auto;
-        align-items: start;
-        grid-template-rows: 1fr 99fr;
-      }
-
-      .type-array,
-      .type-obj,
-      .field {
-        margin: 0;
-      }
-
-      .field {
-        color: #4e9590;
-      }
-
-      .field span {
-        color: #000;
-      }
-
-      .type-array,
-      .type-obj {
-        margin: 0;
-        padding: 0 0 0 1.125rem;
-        font-size: 1rem;
-        line-height: 1.75;
-        position: relative;
-      }
-
-      .type-array {
-        padding-bottom: 1.125rem;
-      }
-
-      .type-array::before,
-      .type-obj::before {
-        content: "";
-        position: absolute;
-        width: 1px;
-        background-color: #bfbfbf;
-        bottom: 1.725rem;
-        top: 1.5rem;
-        left: 0.125rem;
-      }
-
-      .type-obj::before {
-        top: 1.725rem;
-        bottom: 0;
-      }
-
-      .type-array > .key,
-      .type-obj > .key {
-        transform: translateX(-1.125rem);
-        color: #4e9590;
-      }
-
-      .type-array[open]::after {
-        content: "]";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        font-weight: bold;
-        color: #f2cab8;
-      }
-
-      .type-array .key,
-      .type-obj .key {
-        list-style: none;
-        cursor: pointer;
-      }
-      .key::-webkit-details-marker {
-        display: none;
-      }
-
-      .type-array > .key::after {
-        content: "[...]";
-        display: inline-block;
-        margin-left: 0.5ex;
-        font-weight: bold;
-        color: #f2cab8;
-      }
-
-      .type-array[open] > .key::after {
-        content: "[";
-      }
-
-      .type-array > .field,
-      .type-array > .type-array > .key,
-      .type-array > .type-obj > .key {
-        color: #bfbfbf;
-      }
-    </style>
+    <link href="dist/css/style.css" rel="stylesheet" />
     <title>Tree viewer</title>
   </head>
   <body>
-    <main class="tree-container">
+    <section class="tree-container">
       <h1 id="file-name" class="file-name">alltypes.json</h1>
       <div class="tree-viewer">
         <details class="type-array" open>
@@ -182,7 +70,6 @@
           </details>
         </details>
       </div>
-    </main>
-    <script></script>
+    </section>
   </body>
 </html>

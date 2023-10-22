@@ -43,26 +43,22 @@ export function customJSONParser(text) {
   };
 
   parser.onvalue = (value) => {
-    // console.info("value");
     var key = parent.at(-1) === "array" ? arrayIndex[depth]++ : currentKey;
     currentKey = null;
     pushEvent(value, key);
   };
 
   parser.onopenobject = (key) => {
-    // console.info("open object");
     handleOpen("object", "{", key);
     currentKey = key;
   };
 
   parser.onopenarray = () => {
-    // console.info("open array");
     handleOpen("array", "[");
     arrayIndex[depth] = 0;
   };
 
   parser.oncloseobject = () => {
-    // console.info("close object");
     if (depth === 0) {
       return;
     }
@@ -70,13 +66,11 @@ export function customJSONParser(text) {
   };
 
   parser.onclosearray = () => {
-    // console.info("close array");
     handleClose("]");
   };
 
   parser.onend = () => {
     resolve(eventQueue);
-    // console.info("end");
   };
 
   parser.write(text).close();
