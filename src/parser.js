@@ -1,17 +1,22 @@
 import clarinet from "clarinet";
 
-export function customJSONParser(text) {
+export function customJSONParser(text, pageSize = 250, onPage) {
   var parser = clarinet.parser();
   var parent = ["root"];
   var arrayIndex = [0];
   var currentKey = null;
   var depth = 0;
+  var lines = 0;
   var eventQueue = [];
   var resolve;
   var promise = new Promise((r) => (resolve = r));
 
   function pushEvent(value, key) {
+    lines++;
     eventQueue.push([depth, key, value]);
+    if (lines % pageSize === 0 && onPage) {
+      onPage(eventQueue);
+    }
   }
 
   function handleOpen(type, value) {

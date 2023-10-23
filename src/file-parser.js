@@ -1,14 +1,32 @@
 import { customJSONParser } from "./parser";
 
 onmessage = (e) => {
-  processJSON(e.data).then(() => {
-    postMessage("pong");
-  });
+  var [key, value] = e.data;
+
+  if (key === "file-upload") {
+    parseFile(value);
+  }
 };
 
+function onPage(page) {
+  postMessage(["parsing-page", page]);
+}
+
+function parseFile(file) {
+  postMessage(["parsing-started"]);
+
+  processJSON(file, 250, onPage)
+    .then((lines) => {
+      postMessage(["parsing-done", lines]);
+    })
+    .catch(() => {
+      postMessage(["parsing-error"]);
+    });
+}
+
 async function processJSON(blob) {
-  const reader = new FileReaderSync();
-  const text = reader.readAsText(blob);
+  var reader = new FileReaderSync();
+  var text = reader.readAsText(blob);
 
   return await customJSONParser(text);
 }

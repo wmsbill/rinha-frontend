@@ -13,6 +13,16 @@ h1 {
   margin: 0;
 }
 
+.hide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.error {
+  color: #bf0e0e;
+  font-size: 1rem;
+}
+
 .home-container {
   display: grid;
   place-items: center;
@@ -31,6 +41,11 @@ h1 {
   margin: 0;
   font-size: 1.5rem;
   text-align: center;
+}
+
+.file-upload {
+  display: grid;
+  gap: 1.5rem;
 }
 
 .file-upload-field {
@@ -52,6 +67,7 @@ h1 {
   background: linear-gradient(180deg, #e4e4e4 0%, #f7f7f7 100%);
   position: relative;
   overflow: hidden;
+  margin: 0 auto;
 }
 
 .upload-label:has(.file-upload-field:focus),

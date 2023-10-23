@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Json viewer for rinha de front end contest"
+    />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,29 +31,48 @@
             class="file-upload-field"
           />
         </label>
+        <p id="error" class="error hide" aria-hidden="true">
+          Invalid file. Please load a valid JSON file.
+        </p>
       </form>
     </main>
 
     <script>
-      var fileReader = new Worker("dist/file-reader.js");
-      var fileInput = document.querySelector("#json-file");
+      var fileParser = new Worker("dist/js/file-parser.js");
+      var fileInput = document.getElementById("json-file");
+      // TODO: Extract error label behavior to a function
+      var error = document.getElementById("error");
       fileInput.addEventListener("change", handleFileUpload);
-      var buttonLabel = document.querySelector("#label");
+      // TODO: Extract button label behavior to a function
+      var buttonLabel = document.getElementById("label");
 
       function handleFileUpload(e) {
         buttonLabel.innerText = "loading...";
+        error.classList.add("hide");
+        error.setAttribute("aria-hidden", "true");
         var file = e.target.files[0];
         var t0 = performance.now();
 
-        fileReader.postMessage(file);
-        fileReader.onmessage = (e) => {
-          var t1 = performance.now();
-          console.log(t1 - t0);
-          window.gustavo = e;
+        fileParser.postMessage(["file-upload", file]);
+        fileParser.onmessage = (e) => {
+          var [key, value] = e.data;
+
+          switch (key) {
+            case "parsing-done":
+              var t1 = performance.now();
+              console.log(t1 - t0);
+              break;
+            case "parsing-error":
+              error.classList.remove("hide");
+              break;
+          }
+
           buttonLabel.innerText = "Load JSON";
         };
-        fileReader.onerror = (event) => {
+        fileParser.onerror = (event) => {
           console.log(event);
+          error.classList.remove("hide");
+          error.setAttribute("aria-hidden", "false");
           buttonLabel.innerText = "Load JSON";
         };
       }
