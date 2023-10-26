@@ -15,7 +15,7 @@ function onPage(page) {
 function parseFile(file) {
   postMessage(["parsing-started"]);
 
-  processJSON(file, 250, onPage)
+  processJSON(file)
     .then((lines) => {
       postMessage(["parsing-done", lines]);
     })
@@ -28,5 +28,5 @@ async function processJSON(blob) {
   var reader = new FileReaderSync();
   var text = reader.readAsText(blob);
 
-  return await customJSONParser(text);
+  return await customJSONParser(text, 250, onPage);
 }

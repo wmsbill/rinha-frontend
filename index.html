@@ -18,63 +18,127 @@
     <title>JSON Tree Viewer</title>
   </head>
   <body>
-    <main class="home-container">
-      <h1>JSON Tree Viewer</h1>
-      <p>Simple JSON Viewer that runs completely on-client. No data exchange</p>
-      <form class="file-upload">
-        <label class="upload-label">
-          <span id="label">Load JSON</span>
-          <input
-            type="file"
-            name="json-file"
-            id="json-file"
-            class="file-upload-field"
-          />
-        </label>
-        <p id="error" class="error hide" aria-hidden="true">
-          Invalid file. Please load a valid JSON file.
+    <main>
+      <section class="home-container">
+        <h1>JSON Tree Viewer</h1>
+        <p>
+          Simple JSON Viewer that runs completely on-client. No data exchange
         </p>
-      </form>
+        <form class="file-upload">
+          <label class="upload-label">
+            <span id="label">Load JSON</span>
+            <input
+              type="file"
+              name="json-file"
+              id="json-file"
+              class="file-upload-field"
+            />
+          </label>
+          <p id="error" class="error hide" aria-hidden="true">
+            Invalid file. Please load a valid JSON file.
+          </p>
+        </form>
+      </section>
+      <section class="tree-container hide">
+        <h1 id="file-name" class="file-name">alltypes.json</h1>
+        <div class="tree-viewer"></div>
+      </section>
     </main>
-
-    <script>
+    <script type="importmap">
+      {
+        "imports": {
+          "json-renderer": "./dist/js/json-renderer.js"
+        }
+      }
+    </script>
+    <script type="module">
+      import { renderer } from "json-renderer";
+      var homeContainer = document.querySelector(".home-container");
+      var treeContainer = document.querySelector(".tree-container");
+      var jsonViewer = document.querySelector(".tree-viewer");
       var fileParser = new Worker("dist/js/file-parser.js");
       var fileInput = document.getElementById("json-file");
-      // TODO: Extract error label behavior to a function
       var error = document.getElementById("error");
-      fileInput.addEventListener("change", handleFileUpload);
-      // TODO: Extract button label behavior to a function
       var buttonLabel = document.getElementById("label");
+      var fileLines = [];
+      var parsingDone = false;
+      var renderType = "full";
+
+      fileInput.addEventListener("change", handleFileUpload);
 
       function handleFileUpload(e) {
-        buttonLabel.innerText = "loading...";
-        error.classList.add("hide");
-        error.setAttribute("aria-hidden", "true");
+        resetState();
         var file = e.target.files[0];
         var t0 = performance.now();
 
         fileParser.postMessage(["file-upload", file]);
-        fileParser.onmessage = (e) => {
-          var [key, value] = e.data;
+        fileParser.onmessage = handleFileParserMessage(t0);
+        fileParser.onerror = handleFileParserError;
+      }
+
+      function resetState() {
+        fileLines = [];
+        parsingDone = false;
+        renderType = "full";
+        buttonLabel.innerText = "loading...";
+        hideError();
+      }
+
+      function handleFileParserMessage(t0) {
+        return (e) => {
+          var [key, lines] = e.data;
 
           switch (key) {
+            case "parsing-page":
+              renderType = "safe";
+              updateFileLinesAndRenderType(lines);
+              break;
             case "parsing-done":
-              var t1 = performance.now();
-              console.log(t1 - t0);
+              logPerformance(t0);
+              parsingDone = true;
+              updateFileLinesAndRenderType(lines);
               break;
             case "parsing-error":
-              error.classList.remove("hide");
+              showError();
               break;
           }
+        };
+      }
 
-          buttonLabel.innerText = "Load JSON";
-        };
-        fileParser.onerror = (event) => {
-          console.log(event);
-          error.classList.remove("hide");
-          error.setAttribute("aria-hidden", "false");
-          buttonLabel.innerText = "Load JSON";
-        };
+      function handleFileParserError(event) {
+        console.log(event);
+        showError();
+        buttonLabel.innerText = "Load JSON";
+      }
+
+      function updateFileLinesAndRenderType(lines) {
+        fileLines = fileLines.concat(lines);
+        console.info(fileLines);
+        goToJSONViewer();
+      }
+
+      function logPerformance(t0) {
+        var t1 = performance.now();
+        console.log("total", t1 - t0);
+      }
+
+      function goToJSONViewer() {
+        homeContainer.classList.add("hide");
+        treeContainer.classList.remove("hide");
+        buttonLabel.innerText = "Load JSON";
+        if (renderType === "full") {
+          renderer(fileLines, jsonViewer);
+        }
+      }
+
+      function showError() {
+        error.classList.remove("hide");
+        error.setAttribute("aria-hidden", "false");
+      }
+
+      function hideError() {
+        error.classList.add("hide");
+        error.setAttribute("aria-hidden", "true");
       }
     </script>
   </body>

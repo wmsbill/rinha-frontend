@@ -13,14 +13,19 @@ h1 {
   margin: 0;
 }
 
-.hide {
-  visibility: hidden;
-  opacity: 0;
+.home-container.hide {
+  display: none;
 }
 
 .error {
   color: #bf0e0e;
   font-size: 1rem;
+}
+
+.error.hide {
+  display: block;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .home-container {
@@ -180,4 +185,8 @@ h1 {
 .type-array > .type-array > .key,
 .type-array > .type-obj > .key {
   color: #bfbfbf;
+}
+
+.tree-viewer {
+  overflow: auto;
 }

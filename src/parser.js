@@ -16,6 +16,7 @@ export function customJSONParser(text, pageSize = 250, onPage) {
     eventQueue.push([depth, key, value]);
     if (lines % pageSize === 0 && onPage) {
       onPage(eventQueue);
+      eventQueue = [];
     }
   }
 
