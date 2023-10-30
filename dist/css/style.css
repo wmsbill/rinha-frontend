@@ -99,6 +99,7 @@ h1 {
   gap: 1.5rem;
   margin: 0 auto;
   align-items: start;
+  justify-items: stretch;
   grid-template-rows: 1fr 99fr;
 }
 
@@ -189,4 +190,70 @@ h1 {
 
 .tree-viewer {
   overflow: auto;
+}
+/*------------- safe renderer */
+.tree-viewer.safe {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0px 2px,
+    #bfbfbf 2px 3px,
+    transparent 3px 18px
+  );
+}
+
+.line {
+  margin: 0;
+  background-color: #fff;
+  color: #4e9590;
+  line-height: 1.75rem;
+}
+
+.line span {
+  color: #000;
+}
+
+.line.array-open::after {
+  content: "[";
+  display: inline-block;
+  margin-left: 0.5ex;
+  font-weight: bold;
+  color: #f2cab8;
+}
+
+.line.array-close,
+.line.array-close span {
+  padding-bottom: 1.125rem;
+  font-weight: bold;
+  color: #f2cab8;
+}
+
+.line[data-depth="1"] {
+  transform: translateX(18px);
+}
+.line[data-depth="2"] {
+  transform: translateX(36px);
+}
+.line[data-depth="3"] {
+  transform: translateX(54px);
+}
+.line[data-depth="4"] {
+  transform: translateX(72px);
+}
+.line[data-depth="5"] {
+  transform: translateX(90px);
+}
+.line[data-depth="6"] {
+  transform: translateX(108px);
+}
+.line[data-depth="7"] {
+  transform: translateX(126px);
+}
+.line[data-depth="8"] {
+  transform: translateX(144px);
+}
+.line[data-depth="9"] {
+  transform: translateX(162px);
+}
+.line[data-depth="10"] {
+  transform: translateX(180px);
 }

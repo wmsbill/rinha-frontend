@@ -32,6 +32,7 @@
               name="json-file"
               id="json-file"
               class="file-upload-field"
+              accept=".txt,.json,application/json,text/plain"
             />
           </label>
           <p id="error" class="error hide" aria-hidden="true">
@@ -52,7 +53,7 @@
       }
     </script>
     <script type="module">
-      import { renderer } from "json-renderer";
+      import { renderer, safeRenderer } from "json-renderer";
       var homeContainer = document.querySelector(".home-container");
       var treeContainer = document.querySelector(".tree-container");
       var jsonViewer = document.querySelector(".tree-viewer");
@@ -60,19 +61,22 @@
       var fileInput = document.getElementById("json-file");
       var error = document.getElementById("error");
       var buttonLabel = document.getElementById("label");
+      var fileNameTitle = document.getElementById("file-name");
       var fileLines = [];
       var parsingDone = false;
       var renderType = "full";
+      var fileName;
+      var page = "Home";
+      var init = performance.now();
 
       fileInput.addEventListener("change", handleFileUpload);
 
       function handleFileUpload(e) {
         resetState();
         var file = e.target.files[0];
-        var t0 = performance.now();
 
         fileParser.postMessage(["file-upload", file]);
-        fileParser.onmessage = handleFileParserMessage(t0);
+        fileParser.onmessage = handleFileParserMessage();
         fileParser.onerror = handleFileParserError;
       }
 
@@ -84,7 +88,7 @@
         hideError();
       }
 
-      function handleFileParserMessage(t0) {
+      function handleFileParserMessage() {
         return (e) => {
           var [key, lines] = e.data;
 
@@ -94,8 +98,8 @@
               updateFileLinesAndRenderType(lines);
               break;
             case "parsing-done":
-              logPerformance(t0);
               parsingDone = true;
+              console.info("Parsing time", performance.now() - init);
               updateFileLinesAndRenderType(lines);
               break;
             case "parsing-error":
@@ -112,9 +116,10 @@
       }
 
       function updateFileLinesAndRenderType(lines) {
-        fileLines = fileLines.concat(lines);
-        console.info(fileLines);
-        goToJSONViewer();
+        fileLines.push(...lines);
+        if (page !== "Json Viewer") {
+          goToJSONViewer();
+        }
       }
 
       function logPerformance(t0) {
@@ -123,12 +128,21 @@
       }
 
       function goToJSONViewer() {
+        page = "Json Viewer";
         homeContainer.classList.add("hide");
         treeContainer.classList.remove("hide");
         buttonLabel.innerText = "Load JSON";
+        fileNameTitle.textContent = fileName;
+
         if (renderType === "full") {
+          jsonViewer.classList.remove("safe");
           renderer(fileLines, jsonViewer);
-        }
+        } // else {
+        // var t3 = performance.now();
+        // jsonViewer.classList.add("safe");
+        // safeRenderer(fileLines, 0, 250, jsonViewer);
+        // logPerformance(t3);
+        // }
       }
 
       function showError() {

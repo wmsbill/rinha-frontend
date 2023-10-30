@@ -30,6 +30,33 @@ function handleField(key, value, parent) {
   parent.appendChild(node);
 }
 
+function handleSafeLine([depth, key, value], parent) {
+  if (value === "}") {
+    return;
+  }
+  const skip = new Set(["{", "["]);
+  const node = document.createElement("p");
+  const valueNode = document.createElement("span");
+
+  node.classList.add("line");
+  node.textContent = key ? key + ": " : "";
+
+  valueNode.textContent = skip.has(value) ? "" : value;
+
+  if (value === "[") {
+    node.classList.add("array-open");
+  }
+
+  if (value === "]") {
+    node.classList.add("array-close");
+  }
+
+  node.setAttribute("data-depth", depth);
+  node.appendChild(valueNode);
+
+  parent.appendChild(node);
+}
+
 export function renderer(lines, viewer) {
   const root = document.createDocumentFragment();
   let currentParent = root;
@@ -47,6 +74,18 @@ export function renderer(lines, viewer) {
       default:
         handleField(key, value, currentParent);
     }
+  }
+
+  viewer.innerHTML = "";
+  viewer.appendChild(root);
+}
+
+export function safeRenderer(lines, offset, limit, viewer) {
+  const root = document.createDocumentFragment();
+
+  while (offset < limit) {
+    handleSafeLine(lines[offset], root);
+    offset++;
   }
 
   viewer.innerHTML = "";
